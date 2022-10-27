@@ -3,6 +3,7 @@ const router = express.Router();
 const discount_controller = require('./controllers/discount_controller');
 const user_type_controller = require('./controllers/user_type_controller');
 const user_controller = require('./controllers/user_controller');
+const user_auth_controller = require('./controllers/user_auth_controller.js');
 
 // discount routes
 router.post('/discount/create', discount_controller.create);
@@ -24,5 +25,8 @@ router.get('/user/find-by-id/:user_id', user_controller.find_by_id);
 router.get('/user/list', user_controller.list);
 router.put('/user/update/:user_id', user_controller.update);
 router.delete('/user/delete/:user_id', user_controller.delete);
+
+// user_auth routes
+router.post('/user-auth/create', user_auth_controller.create);
 
 module.exports = router;
