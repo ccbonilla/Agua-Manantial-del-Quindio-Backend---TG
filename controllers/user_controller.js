@@ -1,50 +1,61 @@
 const user_controller = module.exports;
 const user_repository = require('../Repositories/user_repository');
+const user_auth_repository = require('../Repositories/user_auth_repository');
 const _ = require('lodash');
 
-user_controller.create = async (req, res, next) => {
-  const { body: user } = req;
-  const user_found = await user_repository.find_by_email(user.email);
+user_controller.create = async (req, res) => {
+  const {
+    body: { name, lastname, email, phone, address, user_type_id, user_id, password },
+  } = req;
+  const user_found = await user_repository.find_by_email(email);
   if (_.isNil(user_found)) {
     return await user_repository
-      .create(user)
-      .then((response) => res.json(response))
-      .catch((error) => next(console.log(`Error : ${error}`)));
+      .create({ name, lastname, email, phone, address, user_type_id, user_id })
+      .then((response) => {
+        const user_auth = {
+          user_id: response[0].user_id,
+          email: email,
+          password: password,
+          user_auth_id: 6,
+        };
+        user_auth_repository.create(user_auth).then((resp) => res.status(200).json(response));
+      })
+      .catch((error) => console.log(`Error : ${error}`));
   } else {
     res.json('Ya existe un cliente con ese email');
   }
 };
-user_controller.find_by_id = async (req, res, next) => {
+user_controller.find_by_id = async (req, res) => {
   const {
     params: { user_id },
   } = req;
   return await user_repository
     .find_by_id(user_id)
-    .then((response) => res.json(response))
-    .catch((error) => next(console.log(`Error : ${error}`)));
+    .then((response) => res.status(200).json(response))
+    .catch((error) => console.log(`Error : ${error}`));
 };
-user_controller.list = async (req, res, next) => {
+user_controller.list = async (req, res) => {
   return await user_repository
     .list()
-    .then((response) => res.json(response))
-    .catch((error) => next(console.log(`Error : ${error}`)));
+    .then((response) => res.status(200).json(response))
+    .catch((error) => console.log(`Error : ${error}`));
 };
-user_controller.update = async (req, res, next) => {
+user_controller.update = async (req, res) => {
   const {
     params: { user_id },
     body: user,
   } = req;
   return await user_repository
     .update(user_id, user)
-    .then((response) => res.json(`Se ha actualizado ${response} registro`))
-    .catch((error) => next(console.log(`Error : ${error}`)));
+    .then((response) => res.status(200).json(`Se ha actualizado ${response} registro`))
+    .catch((error) => console.log(`Error : ${error}`));
 };
-user_controller.delete = async (req, res, next) => {
+user_controller.delete = async (req, res) => {
   const {
     params: { user_id },
   } = req;
   return await user_repository
     .delete(user_id)
-    .then((response) => res.json(`Se ha eliminado ${response} registro`))
-    .catch((error) => next(console.log(`Error : ${error}`)));
+    .then((response) => res.status(200).json(`Se ha eliminado ${response} registro`))
+    .catch((error) => console.log(`Error : ${error}`));
 };
