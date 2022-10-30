@@ -2,6 +2,7 @@ const user_controller = module.exports;
 const user_repository = require('../Repositories/user_repository');
 const user_auth_repository = require('../Repositories/user_auth_repository');
 const _ = require('lodash');
+const bcrypt = require('bcryptjs');
 
 user_controller.create = async (req, res) => {
   const {
@@ -12,11 +13,11 @@ user_controller.create = async (req, res) => {
     return await user_repository
       .create({ name, lastname, email, phone, address, user_type_id, user_id })
       .then((response) => {
+        const salt = bcrypt.genSaltSync(10);
         const user_auth = {
           user_id: response[0].user_id,
           email: email,
-          password: password,
-          user_auth_id: 6,
+          password: bcrypt.hashSync(password, salt),
         };
         user_auth_repository.create(user_auth).then((resp) => res.status(200).json(response));
       })

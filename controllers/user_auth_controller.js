@@ -4,7 +4,6 @@ const _ = require('lodash');
 
 user_auth_controller.create = async (req, res) => {
   const { user_auth } = req;
-  console.log(user_auth);
   return await user_auth_repository
     .create(user_auth)
     .then((response) => res.status(200).json(response))

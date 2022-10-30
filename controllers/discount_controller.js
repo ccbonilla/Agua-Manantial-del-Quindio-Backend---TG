@@ -1,11 +1,11 @@
-const _ = require('lodash');
 const discount_contoller = module.exports;
+const _ = require('lodash');
 const discount_repository = require('../Repositories/discount_repository');
 
 discount_contoller.create = async (req, res) => {
   const { body } = req;
   const found_discount = await discount_repository.find_by_name(body.name);
-  if (_.isNil(found_discount.length)) {
+  if (_.isNil(found_discount)) {
     return await discount_repository
       .create(body)
       .then((response) => res.status(200).json(response))
