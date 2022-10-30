@@ -42,7 +42,7 @@ user_type_controller.update = async (req, res) => {
     return await user_type_repository
       .update(user_type_id, user_type)
       .then((response) => res.status(200).json(`Se ha actualizado ${response} registro`))
-      .catch((error) => next(console.log(error)));
+      .catch((error) => console.log(error));
   } else {
     res.status(400).json('Ya existe este tipo de usuario');
   }
