@@ -9,16 +9,22 @@ discount_contoller.create = async (req, res) => {
     return await discount_repository
       .create(body)
       .then((response) => res.status(200).json(response))
-      .catch((error) => console.log(`Error : ${error}`));
+      .catch((error) => {
+        console.log(`Error : ${error}`);
+        return res.status(500).json('Ha ocurrido un problema');
+      });
   } else {
-    res.json('Ya existe este tipo de descuento');
+    return res.json('Ya existe este tipo de descuento');
   }
 };
 discount_contoller.list = async (req, res) => {
   return await discount_repository
     .list()
     .then((response) => res.status(200).json(response))
-    .catch((error) => console.log(`Error : ${error}`));
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un problema');
+    });
 };
 discount_contoller.find_by_id = async (req, res) => {
   const {
@@ -27,7 +33,10 @@ discount_contoller.find_by_id = async (req, res) => {
   return await discount_repository
     .find_by_id(discount_id)
     .then((response) => res.status(200).json(response))
-    .catch((error) => console.log(`Error : ${error}`));
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un problema');
+    });
 };
 discount_contoller.update = async (req, res) => {
   const {
