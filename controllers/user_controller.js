@@ -1,5 +1,6 @@
 const user_controller = module.exports;
 const user_repository = require('../Repositories/user_repository');
+const user_type_repository = require('../Repositories/user_type_repository');
 const user_auth_repository = require('../Repositories/user_auth_repository');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
@@ -21,9 +22,12 @@ user_controller.create = async (req, res) => {
         };
         user_auth_repository.create(user_auth).then((resp) => res.status(200).json(response));
       })
-      .catch((error) => console.log(`Error : ${error}`));
+      .catch((error) => {
+        console.log(`Error : ${error}`);
+        return res.status(500).json('Ha ocurrido un problema');
+      });
   } else {
-    res.json('Ya existe un cliente con ese email');
+    return res.json('Ya existe un cliente con ese email');
   }
 };
 user_controller.find_by_id = async (req, res) => {
@@ -33,13 +37,23 @@ user_controller.find_by_id = async (req, res) => {
   return await user_repository
     .find_by_id(user_id)
     .then((response) => res.status(200).json(response))
-    .catch((error) => console.log(`Error : ${error}`));
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un problema');
+    });
 };
 user_controller.list = async (req, res) => {
-  return await user_repository
-    .list()
-    .then((response) => res.status(200).json(response))
-    .catch((error) => console.log(`Error : ${error}`));
+  try {
+    const users = await user_repository.list();
+    for (let user of users) {
+      const { name } = await user_type_repository.find_by_id(user.user_type_id);
+      user.user_type_name = name;
+    }
+    res.status(200).json(users);
+  } catch (error) {
+    console.log(`Error : ${error}`);
+    return res.status(500).json('Ha ocurrido un problema');
+  }
 };
 user_controller.update = async (req, res) => {
   const {
@@ -49,7 +63,10 @@ user_controller.update = async (req, res) => {
   return await user_repository
     .update(user_id, user)
     .then((response) => res.status(200).json(`Se ha actualizado ${response} registro`))
-    .catch((error) => console.log(`Error : ${error}`));
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un problema');
+    });
 };
 user_controller.delete = async (req, res) => {
   const {
@@ -58,5 +75,8 @@ user_controller.delete = async (req, res) => {
   return await user_repository
     .delete(user_id)
     .then((response) => res.status(200).json(`Se ha eliminado ${response} registro`))
-    .catch((error) => console.log(`Error : ${error}`));
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un problema');
+    });
 };

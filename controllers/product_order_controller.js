@@ -7,13 +7,19 @@ product_order_controller.create = async (req, res) => {
   return await product_order_repository
     .create(product_order)
     .then((response) => res.status(200).json(response))
-    .catch((error) => console.log(`Error : ${error}`));
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un problema');
+    });
 };
 product_order_controller.list = async (req, res) => {
   return await product_order_repository
     .list()
     .then((response) => res.status(200).json(response))
-    .catch((error) => console.log(`Error : ${error}`));
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un problema');
+    });
 };
 product_order_controller.find_by_id = async (req, res) => {
   const {
@@ -22,7 +28,10 @@ product_order_controller.find_by_id = async (req, res) => {
   return await product_order_repository
     .find_by_id(product_order_id)
     .then((response) => res.status(200).json(response))
-    .catch((error) => console.log(`Error : ${error}`));
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un problema');
+    });
 };
 product_order_controller.list_by_order = async (req, res) => {
   const {
@@ -31,7 +40,10 @@ product_order_controller.list_by_order = async (req, res) => {
   return await product_order_repository
     .list_by_order(order_id)
     .then((response) => res.status(200).json(response))
-    .catch((error) => console.log(`Error : ${error}`));
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un problema');
+    });
 };
 product_order_controller.list_by_product = async (req, res) => {
   const {
@@ -40,7 +52,10 @@ product_order_controller.list_by_product = async (req, res) => {
   return await product_order_repository
     .list_by_product(product_id)
     .then((response) => res.status(200).json(response))
-    .catch((error) => console.log(`Error : ${error}`));
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un problema');
+    });
 };
 product_order_controller.update = async (req, res) => {
   const {
@@ -51,7 +66,10 @@ product_order_controller.update = async (req, res) => {
   return await product_order_repository
     .update(product_order_id, product_order)
     .then((response) => res.status(200).json(`Se ha actualizado ${response} registro`))
-    .catch((error) => console.log(error));
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un problema');
+    });
 };
 product_order_controller.delete = async (req, res) => {
   const {
@@ -60,5 +78,8 @@ product_order_controller.delete = async (req, res) => {
   return await product_order_repository
     .delete(product_order_id)
     .then((response) => res.status(200).json(`Se ha eliminado ${response} registro`))
-    .catch((error) => console.log(error));
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un problema');
+    });
 };

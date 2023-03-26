@@ -9,16 +9,22 @@ product_controller.create = async (req, res) => {
     return await product_repository
       .create(body)
       .then((response) => res.status(200).json(response))
-      .catch((error) => console.log(`Error : ${error}`));
+      .catch((error) => {
+        console.log(`Error : ${error}`);
+        return res.status(500).json('Ha ocurrido un problema');
+      });
   } else {
-    res.json('Ya existe este producto');
+    return res.json('Ya existe este producto');
   }
 };
 product_controller.list = async (req, res) => {
   return await product_repository
     .list()
     .then((response) => res.status(200).json(response))
-    .catch((error) => console.log(`Error : ${error}`));
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un problema');
+    });
 };
 product_controller.find_by_id = async (req, res) => {
   const {
@@ -27,7 +33,10 @@ product_controller.find_by_id = async (req, res) => {
   return await product_repository
     .find_by_id(product_id)
     .then((response) => res.status(200).json(response))
-    .catch((error) => console.log(`Error : ${error}`));
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un problema');
+    });
 };
 product_controller.update = async (req, res) => {
   const {

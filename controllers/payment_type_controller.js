@@ -9,16 +9,22 @@ payment_type_controller.create = async (req, res) => {
     return await payment_type_repository
       .create(payment_type)
       .then((response) => res.status(200).json(response))
-      .catch((error) => console.log(`Error : ${error}`));
+      .catch((error) => {
+        console.log(`Error : ${error}`);
+        return res.status(500).json('Ha ocurrido un problema');
+      });
   } else {
-    res.status(400).json('Ya existe este tipo de pago');
+    return res.status(400).json('Ya existe este tipo de pago');
   }
 };
 payment_type_controller.list = async (req, res) => {
   return await payment_type_repository
     .list()
     .then((response) => res.status(200).json(response))
-    .catch((error) => console.log(`Error : ${error}`));
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un problema');
+    });
 };
 payment_type_controller.find_by_id = async (req, res) => {
   const {
@@ -27,7 +33,10 @@ payment_type_controller.find_by_id = async (req, res) => {
   return await payment_type_repository
     .find_by_id(payment_type_id)
     .then((response) => res.status(200).json(response))
-    .catch((error) => console.log(`Error : ${error}`));
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un problema');
+    });
 };
 payment_type_controller.update = async (req, res) => {
   const {
@@ -42,9 +51,12 @@ payment_type_controller.update = async (req, res) => {
     return await payment_type_repository
       .update(payment_type_id, payment_type)
       .then((response) => res.status(200).json(`Se ha actualizado ${response} registro`))
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        console.log(`Error : ${error}`);
+        return res.status(500).json('Ha ocurrido un problema');
+      });
   } else {
-    res.status(400).json('Ya existe este tipo de usuario');
+    return res.status(400).json('Ya existe este tipo de usuario');
   }
 };
 payment_type_controller.delete = async (req, res) => {
@@ -54,5 +66,8 @@ payment_type_controller.delete = async (req, res) => {
   return await payment_type_repository
     .delete(payment_type_id)
     .then((response) => res.status(200).json(`Se ha eliminado ${response} registro`))
-    .catch((error) => console.log(error));
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un problema');
+    });
 };
