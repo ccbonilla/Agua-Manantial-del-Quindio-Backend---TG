@@ -55,6 +55,7 @@ router.post('/order/create', order_controller.create);
 router.get('/order/list', order_controller.list);
 router.get('/order/find-by-id/:order_id', order_controller.find_by_id);
 router.get('/order/list-by-user/:user_id', order_controller.list_by_user);
+router.get('/order/list-order-states', order_controller.list_order_states);
 router.get('/order/list-by-payment-type/:payment_type_id', order_controller.list_by_payment_type);
 router.put('/order/update/:order_id', order_controller.update);
 router.delete('/order/delete/:order_id', order_controller.delete);
