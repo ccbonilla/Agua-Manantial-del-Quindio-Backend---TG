@@ -9,3 +9,4 @@ order_repository.list_by_payment_type = (payment_type_id) =>
   db('order').select('*').where('payment_type_id', payment_type_id);
 order_repository.update = (order_id, order) => db('order').update(order).where('order_id', order_id);
 order_repository.delete = (order_id) => db('order').where('order_id', order_id).del();
+order_repository.list_states = () => db('order_state').select('*');

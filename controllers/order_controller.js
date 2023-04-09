@@ -57,6 +57,15 @@ order_controller.list_by_user = async (req, res) => {
       return res.status(500).json('Ha ocurrido un problema');
     });
 };
+order_controller.list_order_states = async (req, res) => {
+  return await order_repository
+    .list_states()
+    .then((response) => res.status(200).json(response))
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un error');
+    });
+};
 order_controller.list_by_payment_type = async (req, res) => {
   const {
     params: { payment_type_id },
