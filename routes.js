@@ -59,6 +59,7 @@ router.get('/order/list-by-user/:user_id', order_controller.list_by_user);
 router.get('/order/list-order-states', order_controller.list_order_states);
 router.get('/order/list-by-payment-type/:payment_type_id', order_controller.list_by_payment_type);
 router.put('/order/update/:order_id', order_controller.update);
+router.put('/order/update-state/:order_id', order_controller.update_state);
 router.delete('/order/delete/:order_id', order_controller.delete);
 
 // product_order routes

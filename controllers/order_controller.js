@@ -117,6 +117,21 @@ order_controller.update = async (req, res) => {
       return res.status(500).json('Ha ocurrido un problema');
     });
 };
+order_controller.update_state = async (req, res) => {
+  const {
+    body: order,
+    params: { order_id },
+  } = req;
+  const { order_state } = order;
+
+  return await order_repository
+    .update(order_id, { order_state })
+    .then((response) => res.status(200).json(`Se ha actualizado ${response} registro`))
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un problema');
+    });
+};
 order_controller.delete = async (req, res) => {
   const {
     params: { order_id },
