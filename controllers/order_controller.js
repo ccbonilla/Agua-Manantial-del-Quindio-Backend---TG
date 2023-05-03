@@ -7,9 +7,23 @@ const product_order_repository = require('../Repositories/product_order_reposito
 
 order_controller.create = async (req, res) => {
   const { body: order } = req;
-  return await order_repository
-    .create(order)
-    .then((response) => res.status(200).json(response))
+  let newProductOrder = {
+    product_cant: order.product_cant,
+    product_id: order.product_id,
+  };
+  order.order_date = order.order_date.split('T')[0];
+  delete order.product_cant;
+  delete order.product_id;
+  delete order.customer;
+  delete order.order_id;
+  const [newOrder] = await order_repository.create(order);
+  newProductOrder.order_id = newOrder.order_id;
+
+  return await product_order_repository
+    .create(newProductOrder)
+    .then((response) => {
+      return res.status(200).json(response);
+    })
     .catch((error) => {
       console.log(`Error : ${error}`);
       return res.status(500).json('Ha ocurrido un problema');
@@ -123,7 +137,6 @@ order_controller.update_state = async (req, res) => {
     params: { order_id },
   } = req;
   const { order_state } = order;
-
   return await order_repository
     .update(order_id, { order_state })
     .then((response) => res.status(200).json(`Se ha actualizado ${response} registro`))
