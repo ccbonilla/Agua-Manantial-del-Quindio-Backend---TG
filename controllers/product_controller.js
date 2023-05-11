@@ -4,8 +4,10 @@ const _ = require('lodash');
 
 product_controller.create = async (req, res) => {
   const { body } = req;
+  console.log('body', body);
   const found_product = await product_repository.find_by_name(body.name);
   if (_.isNil(found_product)) {
+    delete body.product_id;
     return await product_repository
       .create(body)
       .then((response) => res.status(200).json(response))

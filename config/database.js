@@ -1,5 +1,5 @@
 const knex = require('knex');
-const MAX_CONNECTION_POOLSIZE = 5;
+const MAX_CONNECTION_POOLSIZE = 150;
 
 // const {
 //   DB_NAME = 'agua_manantial',
