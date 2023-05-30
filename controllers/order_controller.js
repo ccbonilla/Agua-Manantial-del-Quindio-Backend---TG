@@ -12,6 +12,10 @@ order_controller.create = async (req, res) => {
     product_id: order.product_id,
   };
   order.order_date = order.order_date.split('T')[0];
+  let user = await user_repository.find_by_id(order.user_id);
+  user.count = user.count + order.product_cant;
+  await user_repository.update(user.user_id, user);
+
   delete order.product_cant;
   delete order.product_id;
   delete order.customer;
