@@ -9,10 +9,10 @@ const MAX_CONNECTION_POOLSIZE = 150;
 //   DB_PORT = 5432,
 // } = process.env;
 const {
-  DB_NAME = 'aguamanantial1',
+  DB_NAME = 'manantial1',
   DB_USER = 'manantial',
   DB_PASS = 'manantial12345',
-  DB_HOST = 'database-agua-manantial.coqf1pyunolc.us-east-1.rds.amazonaws.com',
+  DB_HOST = 'manantial-db.coqf1pyunolc.us-east-1.rds.amazonaws.com',
   DB_PORT = 5433,
 } = process.env;
 const config = {
