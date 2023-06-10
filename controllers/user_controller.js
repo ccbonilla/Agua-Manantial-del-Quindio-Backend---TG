@@ -10,6 +10,10 @@ user_controller.create = async (req, res) => {
     body: { name, lastname, email, phone, address, user_type_id, user_id, password },
   } = req;
   const user_found = await user_repository.find_by_email(email);
+  const user_foundCedula = await user_repository.find_by_id(user_id);
+  if (!_.isNil(user_foundCedula)) {
+    return res.json('Ya existe un cliente suscrito con ese numero de cedula');
+  }
   if (_.isNil(user_found)) {
     return await user_repository
       .create({ name, lastname, email, phone, address, user_type_id, user_id })
@@ -30,6 +34,7 @@ user_controller.create = async (req, res) => {
     return res.json('Ya existe un cliente con ese email');
   }
 };
+
 user_controller.find_by_id = async (req, res) => {
   const {
     params: { user_id },
