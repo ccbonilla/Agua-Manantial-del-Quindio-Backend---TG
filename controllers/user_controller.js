@@ -7,31 +7,35 @@ const bcrypt = require('bcryptjs');
 
 user_controller.create = async (req, res) => {
   const {
-    body: { name, lastname, email, phone, address, user_type_id, user_id, password },
+    body: { name, lastname, email, phone, address, user_type_id, password, identification },
   } = req;
-  const user_found = await user_repository.find_by_email(email);
-  const user_foundCedula = await user_repository.find_by_id(user_id);
-  if (!_.isNil(user_foundCedula)) {
-    return res.json('Ya existe un cliente subscrito con ese numero de cedula');
+  const user_found_by_email = await user_repository.find_by_email(email);
+  const user_found_by_identification = await user_repository.find_by_identification(identification);
+  if (!_.isNil(user_found_by_identification)) {
+    return res.json({ msg: 'Ya existe un cliente suscrito con ese número de cedula' });
   }
-  if (_.isNil(user_found)) {
+  if (_.isNil(user_found_by_email)) {
     return await user_repository
-      .create({ name, lastname, email, phone, address, user_type_id, user_id })
-      .then((response) => {
-        const salt = bcrypt.genSaltSync(10);
-        const user_auth = {
-          user_id: response[0].user_id,
-          email: email,
-          password: bcrypt.hashSync(password, salt),
-        };
-        user_auth_repository.create(user_auth).then((resp) => res.status(200).json(response));
+      .create({ name, lastname, email, phone, address, user_type_id, identification })
+      .then(([response]) => {
+        if (response.user_type_id == 2) {
+          const salt = bcrypt.genSaltSync(10);
+          const user_auth = {
+            user_id: response.user_id,
+            email: email,
+            password: bcrypt.hashSync(password, salt),
+          };
+          user_auth_repository.create(user_auth).then((resp) => res.status(200).json(response));
+        } else {
+          res.status(200).json(response);
+        }
       })
       .catch((error) => {
         console.log(`Error : ${error}`);
-        return res.status(500).json('Ha ocurrido un problema');
+        return res.status(500).json({ msg: 'Ha ocurrido un problema' });
       });
   } else {
-    return res.json('Ya existe un cliente con ese email');
+    return res.json({ msg: 'Ya existe un cliente con ese email' });
   }
 };
 
