@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const { isSameDay, isSameMonth, isSameWeek } = require('date-fns');
 const order_controller = module.exports;
 const order_repository = require('../Repositories/order_repository');
 const user_repository = require('../Repositories/user_repository');
@@ -7,31 +8,46 @@ const product_order_repository = require('../Repositories/product_order_reposito
 
 order_controller.create = async (req, res) => {
   const { body: order } = req;
-  let newProductOrder = {
-    product_cant: order.product_cant,
-    product_id: order.product_id,
-  };
+  let product_discount = 0;
+  let order_value = 0;
+  const products = order.products;
   order.order_date = order.order_date.split('T')[0];
+  order.order_state = 1;
   let user = await user_repository.find_by_id(order.user_id);
-  user.count = user.count + order.product_cant;
-  await user_repository.update(user.user_id, user);
-
-  delete order.product_cant;
-  delete order.product_id;
   delete order.customer;
   delete order.order_id;
+  delete order.products;
   const [newOrder] = await order_repository.create(order);
-  newProductOrder.order_id = newOrder.order_id;
-
-  return await product_order_repository
-    .create(newProductOrder)
-    .then((response) => {
-      return res.status(200).json(response);
-    })
-    .catch((error) => {
-      console.log(`Error : ${error}`);
-      return res.status(500).json('Ha ocurrido un problema');
-    });
+  for (let product of products) {
+    let newProductOrder = {
+      order_id: newOrder.order_id,
+      product_cant: product.product_cant,
+      product_id: product.product_id,
+    };
+    await product_order_repository.create(newProductOrder);
+    const { value } = await product_repository.find_by_id(product.product_id);
+    order_value += value * product.product_cant;
+    if (product.product_id == 1) {
+      for (let i = 0; i < product.product_cant; i++) {
+        user.count += 1;
+        if (user.user_type_id == 1 && user.count == 6) {
+          user.user_type_id = 2;
+          user.count = 0;
+          product_discount += value;
+          await user_repository.update(user.user_id, user);
+        } else if (user.user_type_id == 2 && user.count == 7) {
+          user.user_type_id = 1;
+          user.count = 0;
+          product_discount += value;
+          await user_repository.update(user.user_id, user);
+        } else {
+          await user_repository.update(user.user_id, user);
+        }
+      }
+    }
+  }
+  await order_repository.update(newOrder.order_id, { discount: product_discount, value: order_value });
+  return res.status(200).json({ msg: 'Order create successfully' });
 };
 order_controller.list = async (req, res) => {
   try {
@@ -82,6 +98,60 @@ order_controller.list_order_states = async (req, res) => {
     .catch((error) => {
       console.log(`Error : ${error}`);
       return res.status(500).json('Ha ocurrido un error');
+    });
+};
+order_controller.list_by_day = async (req, res) => {
+  const today = new Date();
+  let daySales = [];
+  await order_repository
+    .list()
+    .then((response) => {
+      for (let sale of response) {
+        if (isSameDay(new Date(sale.order_date), today)) {
+          daySales.push(sale);
+        }
+      }
+      return res.status(200).json(daySales);
+    })
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un problema');
+    });
+};
+order_controller.list_by_month = async (req, res) => {
+  const today = new Date();
+  let monthSales = [];
+  await order_repository
+    .list()
+    .then((response) => {
+      for (let sale of response) {
+        if (isSameMonth(new Date(sale.order_date), today)) {
+          monthSales.push(sale);
+        }
+      }
+      return res.status(200).json(monthSales);
+    })
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un problema');
+    });
+};
+order_controller.list_by_week = async (req, res) => {
+  const today = new Date();
+  let weekSales = [];
+  await order_repository
+    .list()
+    .then((response) => {
+      for (let sale of response) {
+        if (isSameWeek(new Date(sale.order_date), today)) {
+          weekSales.push(sale);
+        }
+      }
+      return res.status(200).json(weekSales);
+    })
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un problema');
     });
 };
 order_controller.list_by_payment_type = async (req, res) => {

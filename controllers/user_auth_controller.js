@@ -46,15 +46,12 @@ user_auth_controller.login = async (req, res) => {
   const auth = await user_auth_repository.find_by_email(email);
 
   if (!auth) {
-    console.log('no email');
     return res.status(400).json({ msg: 'Usuario o contraseña incorrecto', status: 400 });
   }
   const hash = bcrypt.compareSync(password, auth.password);
   if (!hash) {
-    console.log('no pass');
     return res.status(400).json({ msg: 'Usuario o contraseña incorrecto' });
   }
-  console.log('hace esto de todos modos');
   const user = await user_repository.find_by_id(auth.user_id);
   return res.status(200).json(user);
 };
