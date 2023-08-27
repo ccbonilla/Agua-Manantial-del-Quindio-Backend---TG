@@ -47,7 +47,7 @@ order_controller.create = async (req, res) => {
     }
   }
   await order_repository.update(newOrder.order_id, { discount: product_discount, value: order_value });
-  return res.status(200).json({ msg: 'Order create successfully' });
+  return res.status(200).json({ msg: 'Order create successfully', status: '200' });
 };
 order_controller.list = async (req, res) => {
   try {
