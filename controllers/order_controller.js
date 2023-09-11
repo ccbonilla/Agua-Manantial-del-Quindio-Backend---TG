@@ -63,7 +63,6 @@ order_controller.list = async (req, res) => {
     }
     res.status(200).json(orders);
   } catch (error) {
-    console.log(`Error : ${error}`);
     return res.status(500).json('Ha ocurrido un problema');
   }
 };
