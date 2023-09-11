@@ -12,14 +12,10 @@ order_controller.create = async (req, res) => {
   const { customer, order_id, products, details, ...restOfOrder } = order;
   let product_discount = 0;
   let order_value = 0;
-  // const products = order.products;
   order.order_date = order.order_date.split('T')[0];
   order.order_state = 1;
   let user = await user_repository.find_by_id(order.user_id);
-  // delete order.customer;
-  // delete order.order_id;
-  // delete order.products;
-  // delete order.details;
+
   const [newOrder] = await order_repository.create(restOfOrder);
   for (let product of products) {
     let newProductOrder = {
