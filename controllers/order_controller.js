@@ -8,7 +8,6 @@ const product_order_repository = require('../Repositories/product_order_reposito
 
 order_controller.create = async (req, res) => {
   const { body: order } = req;
-  console.log('order', order);
   const { customer, order_id, products, details, ...restOfOrder } = order;
   let product_discount = 0;
   let order_value = 0;
@@ -63,7 +62,6 @@ order_controller.list = async (req, res) => {
     }
     res.status(200).json(orders);
   } catch (error) {
-    console.log(`Error : ${error}`);
     return res.status(500).json('Ha ocurrido un problema');
   }
 };
