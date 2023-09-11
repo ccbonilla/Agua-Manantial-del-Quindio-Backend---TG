@@ -2,6 +2,7 @@ const express = require('express');
 require('dotenv').config();
 const morgan = require('morgan');
 const routers = require('./routes');
+const cors = require('cors');
 
 const { PORT = 3000 } = process.env;
 
@@ -31,7 +32,12 @@ class SERVER {
   }
 
   routes() {
+    const corsOptions = {
+      origin: '*', // Esto permite todas las solicitudes desde cualquier origen (en desarrollo, no en producción).
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    };
     this.app.use(routers);
+    this.app.use(cors(corsOptions));
   }
 
   start() {

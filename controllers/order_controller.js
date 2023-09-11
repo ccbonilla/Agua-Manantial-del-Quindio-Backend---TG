@@ -8,16 +8,15 @@ const product_order_repository = require('../Repositories/product_order_reposito
 
 order_controller.create = async (req, res) => {
   const { body: order } = req;
+  console.log('order', order);
+  const { customer, order_id, products, details, ...restOfOrder } = order;
   let product_discount = 0;
   let order_value = 0;
-  const products = order.products;
   order.order_date = order.order_date.split('T')[0];
   order.order_state = 1;
   let user = await user_repository.find_by_id(order.user_id);
-  delete order.customer;
-  delete order.order_id;
-  delete order.products;
-  const [newOrder] = await order_repository.create(order);
+
+  const [newOrder] = await order_repository.create(restOfOrder);
   for (let product of products) {
     let newProductOrder = {
       order_id: newOrder.order_id,
@@ -47,18 +46,19 @@ order_controller.create = async (req, res) => {
     }
   }
   await order_repository.update(newOrder.order_id, { discount: product_discount, value: order_value });
-  return res.status(200).json({ msg: 'Order create successfully', status: '200' });
+  return res.status(200).json({ msg: 'Order create successfully', discount: product_discount });
 };
 order_controller.list = async (req, res) => {
   try {
     const orders = await order_repository.list();
     for (let order of orders) {
+      order.value = order.value - order.discount;
       order.customer = await user_repository.find_by_id(order.user_id);
       order.customer_name = `${order.customer.name} ${order.customer.lastname}`;
-      order.details = await product_order_repository.list_by_order(order.order_id);
-      for (let detail of order.details) {
-        const { name } = await product_repository.find_by_id(detail.product_id);
-        detail.product_name = name;
+      order.products = await product_order_repository.list_by_order(order.order_id);
+      for (let product of order.products) {
+        const { name } = await product_repository.find_by_id(product.product_id);
+        product.product_name = name;
       }
     }
     res.status(200).json(orders);
@@ -175,7 +175,7 @@ order_controller.update = async (req, res) => {
     user_id,
     order_date,
     customer: { name, lastname, phone, address },
-    details,
+    products,
   } = order;
   // Actulizar datos del cliente del pedido
   const update_customer = {
@@ -186,9 +186,8 @@ order_controller.update = async (req, res) => {
   };
   await user_repository.update(user_id, update_customer);
   //Actualizar cantidad de productos
-  const new_detail = {
-    product_cant: details[0].product_cant,
-  };
+  const order_in_bd = await order_repository.find_by_id(order_id);
+
   await product_order_repository.update(details[0].product_order_id, new_detail);
   const { value: product_value } = await product_repository.find_by_id(details[0].product_id);
   const value = product_value * details[0].product_cant;
