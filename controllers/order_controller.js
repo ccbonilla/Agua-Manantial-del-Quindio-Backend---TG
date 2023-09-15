@@ -8,7 +8,7 @@ const product_order_repository = require('../Repositories/product_order_reposito
 
 order_controller.create = async (req, res) => {
   const { body: order } = req;
-  const { customer, order_id, products, details, ...restOfOrder } = order;
+  const { customer, order_id, products, customer_name, details, ...restOfOrder } = order;
   let product_discount = 0;
   let order_value = 0;
   order.order_date = order.order_date.split('T')[0];
