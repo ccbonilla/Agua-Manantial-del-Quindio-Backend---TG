@@ -69,13 +69,18 @@ order_controller.find_by_id = async (req, res) => {
   const {
     params: { order_id },
   } = req;
-  return await order_repository
-    .find_by_id(order_id)
-    .then((response) => res.status(200).json(response))
-    .catch((error) => {
-      console.log(`Error : ${error}`);
-      return res.status(500).json('Ha ocurrido un problema');
-    });
+  try {
+    const order = await order_repository.find_by_id(order_id);
+    order.products = await product_order_repository.list_by_order(order.order_id);
+    for (let product of order.products) {
+      const { name } = await product_repository.find_by_id(product.product_id);
+      product.product_name = name;
+    }
+    res.status(200).json(order);
+  } catch (error) {
+    console.log(`Error : ${error}`);
+    return res.status(500).json('Ha ocurrido un problema');
+  }
 };
 order_controller.list_by_user = async (req, res) => {
   const {
@@ -169,33 +174,97 @@ order_controller.update = async (req, res) => {
     body: order,
     params: { order_id },
   } = req;
-  const {
-    user_id,
-    order_date,
-    customer: { name, lastname, phone, address },
-    products,
-  } = order;
-  // Actulizar datos del cliente del pedido
-  const update_customer = {
-    name,
-    lastname,
-    phone,
-    address,
-  };
-  await user_repository.update(user_id, update_customer);
+  let { customer, customer_name, products, ...restOfOrder } = order;
+  // await user_repository.update(user_id, update_customer);
   //Actualizar cantidad de productos
   const order_in_bd = await order_repository.find_by_id(order_id);
+  restOfOrder.value = order_in_bd.value;
+  const products_in_bd = await product_order_repository.list_by_order(order_id);
+  for (let product of products) {
+    const { value } = await product_repository.find_by_id(product.product_id);
+    const product_change = products_in_bd.find(
+      (p) => p.product_order_id == product.product_order_id && p.product_cant != product.product_cant
+    );
+    let diff = 0;
+    if (product.product_cant - product_change.product_cant < 0) {
+      diff = (product.product_cant - product_change.product_cant) * -1;
+      if (product_change.product_id == 1) {
+        for (let i = 0; i < diff; i++) {
+          customer.count -= 1;
+          if (customer.user_type_id == 1 && customer.count == 6) {
+            console.log('tipo 1 count 6');
+            customer.user_type_id = 2;
+            customer.count = 0;
+            restOfOrder.discount -= value;
+            await user_repository.update(customer.user_id, customer);
+          } else if (customer.user_type_id == 2 && customer.count == 7) {
+            console.log('tipo 2 count 7');
+            customer.user_type_id = 1;
+            customer.count = 0;
+            restOfOrder.discount -= value;
+            await user_repository.update(customer.user_id, customer);
+          } else {
+            if (customer.user_type_id == 1 && customer.count == -1) {
+              console.log('tipo 1 count -1', customer.count);
+              customer.user_type_id = 2;
+              restOfOrder.discount -= value;
+              customer.count = 6;
+              await user_repository.update(customer.user_id, customer);
+            } else if (customer.user_type_id == 2 && customer.count == -1) {
+              console.log('tipo 2 count -1', customer.count);
+              customer.user_type_id = 1;
+              restOfOrder.discount -= value;
+              customer.count = 5;
+              await user_repository.update(customer.user_id, customer);
+            } else {
+              console.log('a ninguno', customer.user_type_id, customer.count);
+              await user_repository.update(customer.user_id, customer);
+            }
+          }
+        }
+      }
+      console.log('valor antes negativo', restOfOrder.value, value * diff);
+      restOfOrder.value -= value * diff;
+      console.log('valor después negativo', restOfOrder.value, value * diff);
+    } else {
+      diff = product.product_cant - product_change.product_cant;
+      if (product_change.product_id == 1) {
+        for (let i = 0; i < diff; i++) {
+          customer.count += 1;
+          if (customer.user_type_id == 1 && customer.count == 6) {
+            customer.user_type_id = 2;
+            customer.count = 0;
+            restOfOrder.discount += value;
+            await user_repository.update(customer.user_id, customer);
+          } else if (customer.user_type_id == 2 && customer.count == 7) {
+            customer.user_type_id = 1;
+            customer.count = 0;
+            restOfOrder.discount += value;
+            await user_repository.update(customer.user_id, customer);
+          } else {
+            await user_repository.update(customer.user_id, customer);
+          }
+        }
+      }
+      console.log('valor antes positivo', restOfOrder.value, value * diff);
+      restOfOrder.value += value * diff;
+      console.log('valor después positivo', restOfOrder.value, value * diff);
+    }
 
-  await product_order_repository.update(details[0].product_order_id, new_detail);
-  const { value: product_value } = await product_repository.find_by_id(details[0].product_id);
-  const value = product_value * details[0].product_cant;
+    const { product_name, ...restOfProduct } = product;
+    await product_order_repository.update(product.product_order_id, restOfProduct);
+  }
+
+  // const { value: product_value } = await product_repository.find_by_id(details[0].product_id);
+  // const value = product_value * details[0].product_cant;
   // Actualizar datos del pedido
-  const update_order = {
-    order_date,
-    value,
-  };
+  // const update_order = {
+  //   order_date,
+  //   value,
+  // };
+  console.log('restorder', restOfOrder);
   return await order_repository
-    .update(order_id, update_order)
+    .update(order_id, restOfOrder)
     .then((response) => res.status(200).json(`Se ha actualizado ${response} registro`))
     .catch((error) => {
       console.log(`Error : ${error}`);

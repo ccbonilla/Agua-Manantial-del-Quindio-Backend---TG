@@ -19,7 +19,7 @@ const config = {
   client: 'pg',
   connection: `postgres://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}`,
   pool: { min: 1, max: MAX_CONNECTION_POOLSIZE },
-  acquireConnectionTimeout: 5000,
+  acquireConnectionTimeout: 8000,
 };
 const Db = knex(config);
 module.exports = Db;
