@@ -67,8 +67,10 @@ user_controller.list = async (req, res) => {
 user_controller.update = async (req, res) => {
   const {
     params: { user_id },
-    body: user,
+    body,
   } = req;
+  const { user_type_name, ...user } = body;
+
   return await user_repository
     .update(user_id, user)
     .then((response) => res.status(200).json(`Se ha actualizado ${response} registro`))
