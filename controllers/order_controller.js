@@ -242,6 +242,7 @@ order_controller.update = async (req, res) => {
       }
     }
 
+    await user_repository.update(customer.user_id, customer);
     const { product_name, ...restOfProduct } = product;
     await product_order_repository.update(product.product_order_id, restOfProduct);
   }
