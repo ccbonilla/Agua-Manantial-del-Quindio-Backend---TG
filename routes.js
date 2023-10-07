@@ -35,7 +35,8 @@ router.delete('/user/delete/:user_id', user_controller.delete);
 // user_auth routes
 router.post('/user-auth/create', user_auth_controller.create);
 router.get('/user-auth/find-by-email/:email', user_auth_controller.find_by_email);
-router.put('/user-auth/update/:user_auth_id', user_auth_controller.update);
+router.put('/user-auth/update/:email', user_auth_controller.update);
+router.get('/user-auth/reset-password/:email', user_auth_controller.reset_password);
 
 // product routes
 router.post('/product/create', product_controller.create);
