@@ -18,7 +18,7 @@ user_controller.create = async (req, res) => {
     return await user_repository
       .create({ name, lastname, email, phone, address, user_type_id, identification, ticket, lat, lon })
       .then(([response]) => {
-        if (response.user_type_id == 2) {
+        if (response.user_type_id == 3) {
           const salt = bcrypt.genSaltSync(10);
           const user_auth = {
             user_id: response.user_id,
