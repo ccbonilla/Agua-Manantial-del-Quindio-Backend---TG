@@ -29,12 +29,12 @@ order_controller.create = async (req, res) => {
       for (let i = 0; i < product.product_cant; i++) {
         user.count += 1;
         if (user.user_type_id == 1 && user.count == 6) {
-          user.user_type_id = 2;
+          // user.user_type_id = 2;
           user.count = 0;
           product_discount += value;
           await user_repository.update(user.user_id, user);
         } else if (user.user_type_id == 2 && user.count == 7) {
-          user.user_type_id = 1;
+          // user.user_type_id = 1;
           user.count = 0;
           product_discount += value;
           await user_repository.update(user.user_id, user);
@@ -191,23 +191,23 @@ order_controller.update = async (req, res) => {
           for (let i = 0; i < diff; i++) {
             customer.count -= 1;
             if (customer.user_type_id == 1 && customer.count == 6) {
-              customer.user_type_id = 2;
+              // customer.user_type_id = 2;
               customer.count = 0;
               restOfOrder.discount -= value;
               await user_repository.update(customer.user_id, customer);
             } else if (customer.user_type_id == 2 && customer.count == 7) {
-              customer.user_type_id = 1;
+              // customer.user_type_id = 1;
               customer.count = 0;
               restOfOrder.discount -= value;
               await user_repository.update(customer.user_id, customer);
             } else {
               if (customer.user_type_id == 1 && customer.count == -1) {
-                customer.user_type_id = 2;
+                // customer.user_type_id = 2;
                 restOfOrder.discount -= value;
                 customer.count = 6;
                 await user_repository.update(customer.user_id, customer);
               } else if (customer.user_type_id == 2 && customer.count == -1) {
-                customer.user_type_id = 1;
+                // customer.user_type_id = 1;
                 restOfOrder.discount -= value;
                 customer.count = 5;
                 await user_repository.update(customer.user_id, customer);
@@ -224,12 +224,12 @@ order_controller.update = async (req, res) => {
           for (let i = 0; i < diff; i++) {
             customer.count += 1;
             if (customer.user_type_id == 1 && customer.count == 6) {
-              customer.user_type_id = 2;
+              // customer.user_type_id = 2;
               customer.count = 0;
               restOfOrder.discount += value;
               await user_repository.update(customer.user_id, customer);
             } else if (customer.user_type_id == 2 && customer.count == 7) {
-              customer.user_type_id = 1;
+              // customer.user_type_id = 1;
               customer.count = 0;
               restOfOrder.discount += value;
               await user_repository.update(customer.user_id, customer);

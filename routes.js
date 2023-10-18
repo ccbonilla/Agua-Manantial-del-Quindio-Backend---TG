@@ -9,6 +9,7 @@ const payment_type_controller = require('./controllers/payment_type_controller')
 const order_controller = require('./controllers/order_controller');
 const product_order_controller = require('./controllers/product_order_controller');
 const info_controller = require('./controllers/info_controller');
+const section_controller = require('./controllers/section_controller');
 
 // discount routes
 router.post('/discount/create', discount_controller.create);
@@ -78,5 +79,12 @@ router.delete('/product-order/delete/:product_order_id', product_order_controlle
 //Info routes
 router.get('/info/get-info/:info_id', info_controller.getInfo);
 router.put('/info/update/:info_id', info_controller.update);
+
+//Section routes
+router.post('/section/create', section_controller.create);
+router.get('/section/list', section_controller.list);
+router.get('/section/find-by-id/:section_id', section_controller.find_by_id);
+router.put('/section/update/:section_id', section_controller.update);
+router.delete('/section/delete/:section_id', section_controller.delete);
 
 module.exports = router;
