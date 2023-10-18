@@ -7,7 +7,20 @@ const bcrypt = require('bcryptjs');
 
 user_controller.create = async (req, res) => {
   const {
-    body: { name, lastname, email, phone, address, user_type_id, password, identification, ticket, lat, lon },
+    body: {
+      name,
+      lastname,
+      email,
+      phone,
+      address,
+      address_detail,
+      user_type_id,
+      password,
+      identification,
+      ticket,
+      lat,
+      lon,
+    },
   } = req;
   const user_found_by_email = await user_repository.find_by_email(email);
   const user_found_by_identification = await user_repository.find_by_identification(identification);
@@ -16,7 +29,7 @@ user_controller.create = async (req, res) => {
   }
   if (_.isNil(user_found_by_email)) {
     return await user_repository
-      .create({ name, lastname, email, phone, address, user_type_id, identification, ticket, lat, lon })
+      .create({ name, lastname, email, phone, address, address_detail, user_type_id, identification, ticket, lat, lon })
       .then(([response]) => {
         if (response.user_type_id == 3) {
           const salt = bcrypt.genSaltSync(10);
