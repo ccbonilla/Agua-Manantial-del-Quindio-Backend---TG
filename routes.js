@@ -29,6 +29,7 @@ router.delete('/user-type/delete/:user_type_id', user_type_controller.delete);
 router.post('/user/create', user_controller.create);
 router.post('/user/login', user_auth_controller.login);
 router.get('/user/find-by-id/:user_id', user_controller.find_by_id);
+router.get('/user/find-by-identification/:identification', user_controller.find_by_identification);
 router.get('/user/list', user_controller.list);
 router.put('/user/update/:user_id', user_controller.update);
 router.delete('/user/delete/:user_id', user_controller.delete);

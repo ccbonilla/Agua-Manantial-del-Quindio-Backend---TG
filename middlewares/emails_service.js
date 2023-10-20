@@ -4,15 +4,15 @@ const transporter = nodemailer.createTransport({
   service: 'Gmail',
   port: 465,
   auth: {
-    user: 'johnwilliamreyes1@gmail.com',
-    pass: 'voiwgdlhmiqxbddy',
+    user: 'aguamanantialdelquindio@gmail.com',
+    pass: 'icezhzhtqgpoqoes',
   },
 });
 
 email_service.send_email = async (notification) => {
   const { email, subject, body } = notification;
   const mailOptions = {
-    from: 'jwreyesg@uqvirtual.edu.co',
+    from: 'aguamanantialdelquindio@gmail.com',
     to: email,
     subject: subject,
     html: `${body}`,

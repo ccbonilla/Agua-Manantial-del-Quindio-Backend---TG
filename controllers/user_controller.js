@@ -64,6 +64,18 @@ user_controller.find_by_id = async (req, res) => {
       return res.status(500).json('Ha ocurrido un problema');
     });
 };
+user_controller.find_by_identification = async (req, res) => {
+  const {
+    params: { identification },
+  } = req;
+  return await user_repository
+    .find_by_identification(identification)
+    .then((response) => res.status(200).json(response))
+    .catch((error) => {
+      console.log(`Error : ${error}`);
+      return res.status(500).json('Ha ocurrido un problema');
+    });
+};
 user_controller.list = async (req, res) => {
   try {
     const users = await user_repository.list();
