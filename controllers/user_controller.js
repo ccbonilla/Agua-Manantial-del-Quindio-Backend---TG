@@ -7,35 +7,51 @@ const bcrypt = require('bcryptjs');
 
 user_controller.create = async (req, res) => {
   const {
-    body: {
-      name,
-      lastname,
-      email,
-      phone,
-      address,
-      address_detail,
-      user_type_id,
-      password,
-      identification,
-      ticket,
-      lat,
-      lon,
-    },
+    // body: {
+    //   name,
+    //   lastname,
+    //   email,
+    //   phone,
+    //   address,
+    //   address_detail,
+    //   user_type_id,
+    //   password,
+    //   identification,
+    //   ticket,
+    //   lat,
+    //   lon,
+    //   birthdate,
+    // },
+    body: { user_id, user_type_name, password, ...user },
   } = req;
-  const user_found_by_email = await user_repository.find_by_email(email);
-  const user_found_by_identification = await user_repository.find_by_identification(identification);
+  const user_found_by_email = await user_repository.find_by_email(user.email);
+  const user_found_by_identification = await user_repository.find_by_identification(user.identification);
   if (!_.isNil(user_found_by_identification)) {
     return res.json({ msg: 'Ya existe un cliente suscrito con ese número de cedula' });
   }
   if (_.isNil(user_found_by_email)) {
     return await user_repository
-      .create({ name, lastname, email, phone, address, address_detail, user_type_id, identification, ticket, lat, lon })
+      // .create({
+      //   name,
+      //   lastname,
+      //   email,
+      //   phone,
+      //   address,
+      //   address_detail,
+      //   user_type_id,
+      //   identification,
+      //   ticket,
+      //   lat,
+      //   lon,
+      //   birthdate,
+      // })
+      .create(user)
       .then(([response]) => {
         if (response.user_type_id == 3) {
           const salt = bcrypt.genSaltSync(10);
           const user_auth = {
             user_id: response.user_id,
-            email: email,
+            email: user.email,
             password: bcrypt.hashSync(password, salt),
           };
           user_auth_repository.create(user_auth).then((resp) => res.status(200).json(response));
