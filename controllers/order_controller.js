@@ -28,12 +28,12 @@ order_controller.create = async (req, res) => {
     if (product.product_id == 1) {
       for (let i = 0; i < product.product_cant; i++) {
         user.count += 1;
-        if (user.user_type_id == 1 && user.count == 6) {
+        if (user.user_type_id == 2 && user.count == 6) {
           // user.user_type_id = 2;
           user.count = 0;
           product_discount += value;
           await user_repository.update(user.user_id, user);
-        } else if (user.user_type_id == 2 && user.count == 7) {
+        } else if (user.user_type_id == 1 && user.count == 7) {
           // user.user_type_id = 1;
           user.count = 0;
           product_discount += value;
@@ -56,8 +56,9 @@ order_controller.list = async (req, res) => {
       order.customer_name = `${order.customer.name} ${order.customer.lastname}`;
       order.products = await product_order_repository.list_by_order(order.order_id);
       for (let product of order.products) {
-        const { name } = await product_repository.find_by_id(product.product_id);
+        const { name, value } = await product_repository.find_by_id(product.product_id);
         product.product_name = name;
+        product.value = value;
       }
     }
     res.status(200).json(orders);
@@ -73,9 +74,11 @@ order_controller.find_by_id = async (req, res) => {
     const order = await order_repository.find_by_id(order_id);
     order.products = await product_order_repository.list_by_order(order.order_id);
     for (let product of order.products) {
-      const { name } = await product_repository.find_by_id(product.product_id);
+      const { name, value } = await product_repository.find_by_id(product.product_id);
       product.product_name = name;
+      product.value = value;
     }
+    console.log(order);
     res.status(200).json(order);
   } catch (error) {
     console.log(`Error : ${error}`);
@@ -177,9 +180,10 @@ order_controller.update = async (req, res) => {
   let { customer, customer_name, products, ...restOfOrder } = order;
   const order_in_bd = await order_repository.find_by_id(order_id);
   restOfOrder.value = order_in_bd.value;
+  restOfOrder.order_date = restOfOrder.order_date.split('T')[0];
   const products_in_bd = await product_order_repository.list_by_order(order_id);
   for (let product of products) {
-    const { value } = await product_repository.find_by_id(product.product_id);
+    const { value: product_value } = await product_repository.find_by_id(product.product_id);
     const product_change = products_in_bd.find(
       (p) => p.product_order_id == product.product_order_id && p.product_cant != product.product_cant
     );
@@ -190,26 +194,34 @@ order_controller.update = async (req, res) => {
         if (product_change.product_id == 1) {
           for (let i = 0; i < diff; i++) {
             customer.count -= 1;
-            if (customer.user_type_id == 1 && customer.count == 6) {
+            if (customer.user_type_id == 2 && customer.count == 6) {
               // customer.user_type_id = 2;
               customer.count = 0;
-              restOfOrder.discount -= value;
+              if (restOfOrder.discount > 0) {
+                restOfOrder.discount -= product_value;
+              }
               await user_repository.update(customer.user_id, customer);
-            } else if (customer.user_type_id == 2 && customer.count == 7) {
+            } else if (customer.user_type_id == 1 && customer.count == 7) {
               // customer.user_type_id = 1;
               customer.count = 0;
-              restOfOrder.discount -= value;
+              if (restOfOrder.discount > 0) {
+                restOfOrder.discount -= product_value;
+              }
               await user_repository.update(customer.user_id, customer);
             } else {
-              if (customer.user_type_id == 1 && customer.count == -1) {
+              if (customer.user_type_id == 2 && customer.count == -1) {
                 // customer.user_type_id = 2;
-                restOfOrder.discount -= value;
-                customer.count = 6;
-                await user_repository.update(customer.user_id, customer);
-              } else if (customer.user_type_id == 2 && customer.count == -1) {
-                // customer.user_type_id = 1;
-                restOfOrder.discount -= value;
+                if (restOfOrder.discount > 0) {
+                  restOfOrder.discount -= product_value;
+                }
                 customer.count = 5;
+                await user_repository.update(customer.user_id, customer);
+              } else if (customer.user_type_id == 1 && customer.count == -1) {
+                // customer.user_type_id = 1;
+                if (restOfOrder.discount > 0) {
+                  restOfOrder.discount -= product_value;
+                }
+                customer.count = 6;
                 await user_repository.update(customer.user_id, customer);
               } else {
                 await user_repository.update(customer.user_id, customer);
@@ -217,33 +229,33 @@ order_controller.update = async (req, res) => {
             }
           }
         }
-        restOfOrder.value -= value * diff;
+        restOfOrder.value -= product_value * diff;
       } else {
         diff = product.product_cant - product_change.product_cant;
         if (product_change.product_id == 1) {
           for (let i = 0; i < diff; i++) {
             customer.count += 1;
-            if (customer.user_type_id == 1 && customer.count == 6) {
+            if (customer.user_type_id == 2 && customer.count == 6) {
               // customer.user_type_id = 2;
               customer.count = 0;
-              restOfOrder.discount += value;
+              restOfOrder.discount += product_value;
               await user_repository.update(customer.user_id, customer);
-            } else if (customer.user_type_id == 2 && customer.count == 7) {
+            } else if (customer.user_type_id == 1 && customer.count == 7) {
               // customer.user_type_id = 1;
               customer.count = 0;
-              restOfOrder.discount += value;
+              restOfOrder.discount += product_value;
               await user_repository.update(customer.user_id, customer);
             } else {
               await user_repository.update(customer.user_id, customer);
             }
           }
         }
-        restOfOrder.value += value * diff;
+        restOfOrder.value += product_value * diff;
       }
     }
 
     await user_repository.update(customer.user_id, customer);
-    const { product_name, ...restOfProduct } = product;
+    const { product_name, value, ...restOfProduct } = product;
     await product_order_repository.update(product.product_order_id, restOfProduct);
   }
   return await order_repository

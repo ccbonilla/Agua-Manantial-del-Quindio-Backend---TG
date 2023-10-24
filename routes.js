@@ -10,6 +10,7 @@ const order_controller = require('./controllers/order_controller');
 const product_order_controller = require('./controllers/product_order_controller');
 const info_controller = require('./controllers/info_controller');
 const section_controller = require('./controllers/section_controller');
+const ticket_controller = require('./controllers/ticket_controller');
 
 // discount routes
 router.post('/discount/create', discount_controller.create);
@@ -87,5 +88,15 @@ router.get('/section/list', section_controller.list);
 router.get('/section/find-by-id/:section_id', section_controller.find_by_id);
 router.put('/section/update/:section_id', section_controller.update);
 router.delete('/section/delete/:section_id', section_controller.delete);
+
+// ticket routes
+router.post('/ticket/create', ticket_controller.create);
+router.post('/ticket/create-ticket-holder', ticket_controller.create_ticket_holder);
+router.put('/ticket/update-ticket-holder', ticket_controller.update_ticket_holder);
+router.get('/ticket/list', ticket_controller.list);
+router.get(
+  '/ticket/find-last-ticket-by-ticket-holder/:ticket_holder_id',
+  ticket_controller.find_last_ticket_by_ticket_holder
+);
 
 module.exports = router;
