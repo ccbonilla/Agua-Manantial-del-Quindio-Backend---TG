@@ -1,21 +1,18 @@
-const section_controller = module.exports;
-const section_repository = require('../Repositories/section_repository');
+const ticket_controller = module.exports;
+const ticket_repository = require('../Repositories/ticket_repository');
 
-section_controller.create = async (req, res) => {
-  const {
-    body: { section_id, ...section },
-  } = req;
-
-  return await section_repository
-    .create(section)
+ticket_controller.create = async (req, res) => {
+  const { body: ticket } = req;
+  return await ticket_repository
+    .create(ticket)
     .then((response) => res.status(200).json(response))
     .catch((error) => {
       console.log(`Error : ${error}`);
       return res.status(500).json('Ha ocurrido un error');
     });
 };
-section_controller.list = async (req, res) => {
-  return await section_repository
+ticket_controller.list = async (req, res) => {
+  return await ticket_repository
     .list()
     .then((response) => res.status(200).json(response))
     .catch((error) => {
@@ -23,37 +20,32 @@ section_controller.list = async (req, res) => {
       return res.status(500).json('Ha ocurrido un error');
     });
 };
-section_controller.find_by_id = async (req, res) => {
-  const {
-    params: { section_id },
-  } = req;
-  return await section_repository
-    .find_by_id(section_id)
+ticket_controller.create_ticket_holder = async (req, res) => {
+  const { body: ticket_holder } = req;
+  return await ticket_repository
+    .create_ticket_holder(ticket_holder)
     .then((response) => res.status(200).json(response))
     .catch((error) => {
       console.log(`Error : ${error}`);
       return res.status(500).json('Ha ocurrido un error');
     });
 };
-section_controller.update = async (req, res) => {
+ticket_controller.find_last_ticket_by_ticket_holder = async (req, res) => {
   const {
-    params: { section_id },
-    body,
+    params: { ticket_holder_id },
   } = req;
-  return await section_repository
-    .update(section_id, body)
+  return await ticket_repository
+    .find_last_ticket_by_ticket_holder(ticket_holder_id)
     .then((response) => res.status(200).json(response))
     .catch((error) => {
       console.log(`Error : ${error}`);
       return res.status(500).json('Ha ocurrido un error');
     });
 };
-section_controller.delete = async (req, res) => {
-  const {
-    params: { section_id },
-  } = req;
-  section_repository
-    .delete(section_id)
+ticket_controller.update_ticket_holder = async (req, res) => {
+  const { params: ticket_holder_id, body: ticket_holder } = req;
+  return await ticket_repository
+    .update_ticket_holder(ticket_holder_id, ticket_holder)
     .then((response) => res.status(200).json(response))
     .catch((error) => {
       console.log(`Error : ${error}`);
